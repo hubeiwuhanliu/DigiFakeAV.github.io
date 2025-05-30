@@ -71,7 +71,7 @@ Benchmark for Multimodal Deepfake Detection</h1>
                   </div>
 
                   <div class="is-size-5 publication-authors">
-                    <span class="author-block">Beijing University of Posts and Telecommunications, Beijing Normal University</span>
+                    <span class="author-block">Beijing University of Posts and Telecommunications, Beijing Normal University, Didi Chuxing</span>
                     <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span>
                   </div>
 
@@ -291,82 +291,6 @@ Furthermore, we propose AVTSF , an audio-visual fusion detection model that achi
 <!-- End image carousel -->
 
 
-
-
-  <!-- Supplementary: Benchmark -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <!-- Title -->
-      <h2 class="title is-3 has-text-centered">Supplementary: Benchmark</h2>
-
-      <!-- Content -->
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths content has-text-justified">
-          <p>
-            We benchmark nine representative deepfake detection methods using the DigiFakeAV dataset. These methods span six distinct categories: Basic (Naive), Spatial, Temporal, Frequency, Hybrid Domain, and Multi-modal approaches. Below are descriptions of each method and their performance characteristics.
-          </p>
-
-          <!-- Meso4 -->
-          <h3 class="subtitle is-5">Meso4</h3>
-          <p class="method-description">
-            A lightweight convolutional neural network architecture designed for efficient extraction of facial forgery features, facilitating rapid deepfake detection. While computationally efficient, it struggles with highly realistic synthetic videos.
-          </p>
-
-          <!-- MesoInception4 -->
-          <h3 class="subtitle is-5">MesoInception4</h3>
-          <p class="method-description">
-            An extension of Meso4 that integrates Inception modules to enhance multi-scale feature representation and capture more discriminative cues. It performs better than Meso4 but still shows limitations in detecting digital human-based forgery.
-          </p>
-
-          <!-- Xception-c23 -->
-          <h3 class="subtitle is-5">Xception-c23</h3>
-          <p class="method-description">
-            A deepfake detection approach based on the Xception architecture, leveraging depthwise separable convolutions for improved feature extraction and model efficiency. It achieves strong performance on traditional benchmarks but experiences degradation on DigiFakeAV.
-          </p>
-
-          <!-- Capsule -->
-          <h3 class="subtitle is-5">Capsule</h3>
-          <p class="method-description">
-            A classification method employing capsule networks to preserve hierarchical pose relationships and improve robustness against spatial transformations. It offers moderate accuracy but lacks temporal modeling capabilities.
-          </p>
-
-          <!-- HeadPose -->
-          <h3 class="subtitle is-5">HeadPose</h3>
-          <p class="method-description">
-            A technique that utilizes head pose estimation as discriminative features for classification between genuine and forged videos. Limited by its reliance on facial alignment, it performs poorly on occluded or low-quality frames.
-          </p>
-
-          <!-- F3-Net -->
-          <h3 class="subtitle is-5">F3-Net</h3>
-          <p class="method-description">
-            A method that discriminates forged videos by extracting statistical features from the local frequency domain, effectively capturing subtle forgery artifacts. Demonstrates decent generalization but limited cross-modal reasoning.
-          </p>
-
-          <!-- Cross Efficient ViT -->
-          <h3 class="subtitle is-5">Cross Efficient ViT</h3>
-          <p class="method-description">
-            An approach that incorporates Vision Transformer (ViT) architectures augmented with a voting mechanism to robustly identify deepfake content. Excels in high-resolution image analysis but fails to fully exploit temporal dynamics.
-          </p>
-
-          <!-- SFIConv -->
-          <h3 class="subtitle is-5">SFIConv</h3>
-          <p class="method-description">
-            Combines information from the spatial and frequency domains using a modified convolutional backbone network to enhance detection capabilities of counterfeit features. Achieves balanced performance across real and fake samples.
-          </p>
-
-          <!-- SSVF -->
-          <h3 class="subtitle is-5">SSVF</h3>
-          <p class="method-description">
-            Exploits intrinsic synchronization between visual and audio streams, employing autoregressive models to learn temporal dependencies characteristic of authentic videos and detect anomalies effectively. Shows potential in audio-visual consistency analysis.
-          </p>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End supplementary section -->
 
 
 <!-- Future Works -->
