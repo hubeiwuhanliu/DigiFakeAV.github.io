@@ -1,349 +1,1315 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
   <meta charset="utf-8">
-  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
-  <!-- Replace the content tag with appropriate information -->
-  <meta name="description" content="DESCRIPTION META TAG">
-  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG"/>
-  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG"/>
-  <meta property="og:url" content="URL OF THE WEBSITE"/>
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
-  <meta property="og:image" content="static/image/your_banner_image.png" />
-  <meta property="og:image:width" content="1200"/>
-  <meta property="og:image:height" content="630"/>
-
-
-  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
-  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
-  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
+  <meta name="description" content="DigiFakeAV: The first large-scale multimodal deepfake dataset based on digital human synthesis.">
+  <meta property="og:title" content="DigiFakeAV: Beyond Face Swapping">
+  <meta property="og:description" content="A Diffusion-Based Digital Human Benchmark for Multimodal Deepfake Detection">
+  <meta property="og:url" content="https://hubeiwuhanliu.github.io/DigiFakeAV.github.io/">
+  <meta property="og:image" content="static/images/figure01.png">
   <meta name="twitter:card" content="summary_large_image">
-  <!-- Keywords for your paper to be indexed by-->
-  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
+  <meta name="keywords" content="deepfake detection, digital human, diffusion model, multimodal, dataset, benchmark">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
   <title>DigiFakeAV</title>
-  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-  rel="stylesheet">
 
-  <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
-  <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script src="static/js/bulma-carousel.min.js"></script>
-  <script src="static/js/bulma-slider.min.js"></script>
-  <script src="static/js/index.js"></script>
+  <style>
+    /* ============================================
+       CSS 變數 & 全域設定
+    ============================================ */
+    :root {
+      --bg-primary:    #0a0e1a;
+      --bg-secondary:  #0f1528;
+      --bg-card:       #131929;
+      --bg-card-hover: #1a2235;
+      --accent-cyan:   #00d4ff;
+      --accent-purple: #7c3aed;
+      --accent-pink:   #e11d7a;
+      --accent-amber:  #f59e0b;
+      --accent-green:  #10b981;
+      --text-primary:  #f0f4ff;
+      --text-secondary:#a8b4cc;
+      --text-muted:    #5a6880;
+      --border-subtle: rgba(0, 212, 255, 0.12);
+      --border-glow:   rgba(0, 212, 255, 0.35);
+      --gradient-hero: linear-gradient(135deg, #0a0e1a 0%, #0d1530 40%, #130a2e 100%);
+      --gradient-cyan: linear-gradient(135deg, #00d4ff, #7c3aed);
+      --gradient-card: linear-gradient(145deg, #131929, #0f1528);
+      --shadow-glow:   0 0 40px rgba(0, 212, 255, 0.15);
+      --shadow-card:   0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius-sm:     8px;
+      --radius-md:     14px;
+      --radius-lg:     20px;
+      --radius-xl:     28px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      background: var(--bg-primary);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       滾動條
+    ============================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 3px;
+    }
+
+    /* ============================================
+       背景粒子動畫層
+    ============================================ */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================
+       頂部導覽列
+    ============================================ */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 14, 26, 0.85);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-nav .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      background: var(--gradient-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.05em;
+    }
+
+    .top-nav .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .top-nav .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .top-nav .nav-links a:hover { color: var(--accent-cyan); }
+
+    /* ============================================
+       英雄區塊 (Hero)
+    ============================================ */
+    .hero-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 2rem 60px;
+      overflow: hidden;
+      background: var(--gradient-hero);
+    }
+
+    /* 動態光暈 */
+    .hero-glow-1 {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
+      top: -100px; left: -150px;
+      pointer-events: none;
+    }
+    .hero-glow-2 {
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.12) 0%, transparent 70%);
+      bottom: 0; right: -100px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    /* 標籤徽章 */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    /* 主標題 */
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title .highlight {
+      background: var(--gradient-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle-paper {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    /* 作者資訊 */
+    .authors-block {
+      margin-bottom: 1.5rem;
+    }
+
+    .authors-line {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 2;
+    }
+
+    .authors-line a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .authors-line a:hover {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    .affil-line {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .equal-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* 按鈕組 */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--gradient-cyan);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(0, 212, 255, 0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-glow);
+      color: var(--accent-cyan);
+    }
+    .btn-outline:hover {
+      background: rgba(0, 212, 255, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    /* 統計數字橫幅 */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 3rem;
+      padding: 1.5rem 2rem;
+      background: rgba(0, 212, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.3rem;
+    }
+
+    /* ============================================
+       Teaser 圖片
+    ============================================ */
+    .teaser-section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .teaser-img-wrapper {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-glow), var(--shadow-card);
+      position: relative;
+    }
+
+    .teaser-img-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .teaser-caption {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 1.25rem;
+      padding: 0 1rem;
+    }
+
+    /* ============================================
+       主內容區
+    ============================================ */
+    .main-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ============================================
+       區塊標題
+    ============================================ */
+    .section-wrapper {
+      padding: 5rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-tag::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--accent-cyan);
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title .accent { color: var(--accent-cyan); }
+
+    /* ============================================
+       Abstract 區塊
+    ============================================ */
+    .abstract-section {
+      background: linear-gradient(135deg, #0f1528, #130a2e);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .abstract-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .abstract-card::before {
+      content: '"';
+      position: absolute;
+      top: -10px; left: 20px;
+      font-size: 8rem;
+      color: rgba(0, 212, 255, 0.05);
+      font-family: Georgia, serif;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .abstract-text {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.85;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================
+       Pipeline 區塊
+    ============================================ */
+    .pipeline-section {
+      background: var(--bg-primary);
+    }
+
+    .pipeline-img-wrapper {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+    }
+
+    .pipeline-img-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .pipeline-caption {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      padding: 0 1rem;
+    }
+
+    /* ============================================
+       特性卡片
+    ============================================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: var(--gradient-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(0,212,255,0.06), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-icon.cyan   { background: rgba(0, 212, 255, 0.12); }
+    .feature-icon.purple { background: rgba(124, 58, 237, 0.12); }
+    .feature-icon.pink   { background: rgba(225, 29, 122, 0.12); }
+    .feature-icon.amber  { background: rgba(245, 158, 11, 0.12); }
+    .feature-icon.green  { background: rgba(16, 185, 129, 0.12); }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ============================================
+       Diversity 區塊
+    ============================================ */
+    .diversity-section {
+      background: linear-gradient(135deg, #0f1528, #0a0e1a);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ============================================
+       可視化 (Visualizations)
+    ============================================ */
+    .viz-section { background: var(--bg-primary); }
+
+    .viz-category {
+      margin-bottom: 3rem;
+    }
+
+    .viz-category-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .viz-badge {
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .viz-badge.fvra {
+      background: rgba(0, 212, 255, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .viz-badge.fvfa {
+      background: rgba(225, 29, 122, 0.12);
+      color: var(--accent-pink);
+      border: 1px solid rgba(225, 29, 122, 0.3);
+    }
+
+    .viz-description {
+      color: var(--text-secondary);
+      font-size: 0.925rem;
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .viz-badge.fvfa ~ .viz-description,
+    .viz-description.fvfa-desc {
+      border-left-color: var(--accent-pink);
+    }
+
+    .gif-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .gif-item {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      aspect-ratio: 1;
+      background: var(--bg-card);
+      transition: all 0.3s;
+    }
+
+    .gif-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gif-item:hover {
+      border-color: var(--border-glow);
+      transform: scale(1.03);
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* ============================================
+       Comparison 區塊
+    ============================================ */
+    .comparison-section {
+      background: linear-gradient(135deg, #0f1528, #130a2e);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .comparison-img-wrapper {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .comparison-img-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ============================================
+       Future Works
+    ============================================ */
+    .future-section { background: var(--bg-primary); }
+
+    .future-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .future-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: all 0.3s;
+    }
+
+    .future-card:hover {
+      border-color: var(--border-glow);
+      box-shadow: 0 0 25px rgba(124, 58, 237, 0.15);
+      transform: translateY(-3px);
+    }
+
+    .future-card .fc-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .future-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-purple);
+      margin-bottom: 0.6rem;
+    }
+
+    .future-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ============================================
+       BibTeX
+    ============================================ */
+    .bibtex-section {
+      background: linear-gradient(135deg, #0f1528, #0a0e1a);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .bibtex-wrapper {
+      position: relative;
+    }
+
+    .bibtex-pre {
+      background: #080c18;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      color: #a8b4cc;
+      overflow-x: auto;
+    }
+
+    .bibtex-pre .key   { color: var(--accent-cyan); }
+    .bibtex-pre .value { color: #a5f3fc; }
+    .bibtex-pre .brace { color: var(--accent-amber); }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem; right: 0.75rem;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      color: var(--accent-cyan);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(0, 212, 255, 0.2);
+    }
+
+    /* ============================================
+       Footer
+    ============================================ */
+    footer {
+      background: #060810;
+      border-top: 1px solid var(--border-subtle);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      color: var(--text-muted);
+      font-size: 0.825rem;
+      line-height: 1.8;
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    /* ============================================
+       分隔線
+    ============================================ */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.2;
+    }
+
+    /* ============================================
+       RWD
+    ============================================ */
+    @media (max-width: 768px) {
+      .top-nav .nav-links { display: none; }
+      .btn-group { gap: 0.5rem; }
+      .btn { padding: 0.55rem 1rem; font-size: 0.8rem; }
+      .stats-bar { gap: 1.25rem; }
+      .gif-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .section-wrapper { padding: 3rem 1.25rem; }
+    }
+
+    /* ============================================
+       動畫
+    ============================================ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.7s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .delay-4 { animation-delay: 0.4s; opacity: 0; }
+    .delay-5 { animation-delay: 0.5s; opacity: 0; }
+  </style>
 </head>
 <body>
 
+<!-- 背景網格 -->
+<div class="bg-grid"></div>
 
-  <section class="hero">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered">
-          <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">Beyond Face Swapping: A Diffusion-Based Digital Human
-Benchmark for Multimodal Deepfake Detection</h1>
-            <div class="is-size-5 publication-authors">
-              <!-- Paper authors -->
-              <span class="author-block">
-                <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">Jiaxin Liu</a><sup>*</sup>,</span>
-              <a href="JiaWang_LINK" target="_blank">Jia Wang</a><sup>*</sup>,</span>
-                <span class="author-block">
-                  <a href="SaihuiHou_LINK" target="_blank">Saihui Hou</a><sup>#</sup>,</span>
-              <a href="MinRen_LINK" target="_blank">Min Ren</a>,</span>
-              <a href="HuijiaWu_LINK" target="_blank">Huijia Wu</a>,</span>
-              <a href="HuijiaWu_LINK" target="_blank">Long Ma</a>,</span>
-              <a href="HuijiaWu_LINK" target="_blank">Renwang Pei</a>,</span>
-                  <span class="author-block">
-                    <a href="ZhaofengHe_LINK" target="_blank">Zhaofeng He</a><sup>#</sup>  </span>
-                  </span>
-                  </div>
+<!-- ============================================
+     頂部導覽列
+============================================ -->
+<nav class="top-nav">
+  <div class="logo">DigiFakeAV</div>
+  <ul class="nav-links">
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#diversity">Diversity</a></li>
+    <li><a href="#visualizations">Visualizations</a></li>
+    <li><a href="#comparison">Comparison</a></li>
+    <li><a href="#bibtex">BibTeX</a></li>
+  </ul>
+</nav>
 
-                  <div class="is-size-5 publication-authors">
-                    <span class="author-block">Beijing University of Posts and Telecommunications, Beijing Normal University, Didi Chuxing</span>
-                    <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span>
-                  </div>
+<!-- ============================================
+     英雄區塊
+============================================ -->
+<section class="hero-section" id="top">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
 
-                  <div class="column has-text-centered">
-                    <div class="publication-links">
-                         <!-- Arxiv PDF link -->
-                      <span class="link-block">
-                        <a href="https://huggingface.co/datasets/cambrain/DigiFakeAV/tree/main" target="_blank"
-                        class="external-link button is-normal is-rounded is-dark">
-                        <span class="icon">
-                          <i class="fas fa-file-pdf"></i>
-                        </span>
-                        <span>Download Dataset</span>
-                      </a>
-                    </span>
+  <div class="hero-content">
+    <!-- 小標籤 -->
+    <div class="hero-badge fade-in-up delay-1">
+      CVPR / Multimodal Deepfake Detection &nbsp;·&nbsp; 2025
+    </div>
 
-                    <!-- Supplementary PDF link -->
-                    <span class="link-block">
-                      <a href="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/supplementary/Supplementary.pdf" target="_blank"
-                      class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
-                      <span>Supplementary Material</span>
-                    </a>
-                  </span>
+    <!-- 主標題 -->
+    <h1 class="hero-title fade-in-up delay-2">
+      Beyond Face Swapping:<br>
+      <span class="highlight">A Diffusion-Based Digital Human</span><br>
+      Benchmark for Multimodal Deepfake Detection
+    </h1>
 
-                  <!-- Github link -->
-                  <span class="link-block">
-                    <a href="https://github.com/DigiFakeAV/DigiFakeAV-v1" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-github"></i>
-                    </span>
-                    <span>Code</span>
-                  </a>
-                </span>
+    <!-- 副標題 -->
+    <p class="hero-subtitle-paper fade-in-up delay-3">
+      Introducing <strong style="color: var(--accent-cyan);">DigiFakeAV</strong> — the first large-scale multimodal deepfake dataset based on digital human synthesis
+    </p>
 
-                <!-- ArXiv abstract Link -->
-                <span class="link-block">
-                  <a href="https://arxiv.org/pdf/2505.16512" target="_blank"
-                  class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                    <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
-            </div>
-          </div>
-        </div>
+    <!-- 作者 -->
+    <div class="authors-block fade-in-up delay-3">
+      <div class="authors-line">
+        <a href="#">Jiaxin Liu</a><sup>*</sup>,&ensp;
+        <a href="#">Jia Wang</a><sup>*</sup>,&ensp;
+        <a href="#">Saihui Hou</a><sup>#</sup>,&ensp;
+        <a href="#">Min Ren</a>,&ensp;
+        <a href="#">Huijia Wu</a>,&ensp;
+        <a href="#">Long Ma</a>,&ensp;
+        <a href="#">Renwang Pei</a>,&ensp;
+        <a href="#">Zhaofeng He</a><sup>#</sup>
+      </div>
+      <div class="affil-line">
+        Beijing University of Posts and Telecommunications &nbsp;·&nbsp;
+        Beijing Normal University &nbsp;·&nbsp;
+        Didi Chuxing
+      </div>
+      <div class="equal-note">
+        <sup>*</sup> Equal Contribution &nbsp;&nbsp; <sup>#</sup> Corresponding Author
+      </div>
+    </div>
+
+    <!-- 按鈕組 -->
+    <div class="btn-group fade-in-up delay-4">
+      <a href="https://arxiv.org/pdf/2505.16512" target="_blank" class="btn btn-primary">
+        <i class="ai ai-arxiv"></i> Paper
+      </a>
+      <a href="https://huggingface.co/datasets/cambrain/DigiFakeAV/tree/main" target="_blank" class="btn btn-outline">
+        🤗 Download Dataset
+      </a>
+      <a href="https://github.com/DigiFakeAV/DigiFakeAV-v1" target="_blank" class="btn btn-ghost">
+        <i class="fab fa-github"></i> Code
+      </a>
+      <a href="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/supplementary/Supplementary.pdf" target="_blank" class="btn btn-ghost">
+        <i class="fas fa-file-pdf"></i> Supplementary
+      </a>
+    </div>
+
+    <!-- 統計數字 -->
+    <div class="stats-bar fade-in-up delay-5">
+      <div class="stat-item">
+        <span class="stat-number">60K</span>
+        <span class="stat-label">Total Videos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">8.4M</span>
+        <span class="stat-label">Frames</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">5+</span>
+        <span class="stat-label">Synthesis Methods</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">30%+</span>
+        <span class="stat-label">SOTA Performance Drop</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">2</span>
+        <span class="stat-label">Forgery Categories</span>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- Teaser image -->
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <img src="static/images/figure01.png" alt="Teaser Image" style="width: 100%; height: auto;" />
-      <h2 class="subtitle has-text-centered" style="margin-top: 1rem;">
-        DigiFakeAV, the first large-scale multimodal deepfake dataset based on digital human synthesis. It contains 60,000 videos (8.4 million frames) with diverse identities across nationalities, skin tones, and genders.
-      </h2>
-    </div>
+<!-- ============================================
+     Teaser 圖片
+============================================ -->
+<div class="teaser-section">
+  <div class="teaser-img-wrapper">
+    <img src="static/images/figure01.png" alt="DigiFakeAV Teaser">
   </div>
-</section>
-<!-- End teaser image -->
+  <p class="teaser-caption">
+    DigiFakeAV contains 60,000 videos (8.4 million frames) with diverse identities
+    across nationalities, skin tones, and genders — generated via state-of-the-art digital human synthesis methods.
+  </p>
+</div>
 
+<!-- ============================================
+     Abstract
+============================================ -->
+<section class="section-wrapper abstract-section" id="abstract">
+  <div class="section-inner">
+    <div class="section-tag">Abstract</div>
+    <h2 class="section-title">Overview</h2>
 
-<!-- Paper abstract -->
-<section class="section hero is-light">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            In recent years, deepfake technology has advanced rapidly, yet its misuse poses serious threats to information security and public safety. Existing datasets have mainly focused on traditional face-swapping techniques, failing to reflect the emerging trend of digital human generation methods. These diffusion-based approaches can generate highly realistic videos from speech and target images, offering greater flexibility, stealthiness, and multimodal coherence, thus challenging current detection strategies.
-To address this issue, we introduce DigiFakeAV , the first large-scale multimodal deepfake dataset based on digital human synthesis. It contains 60,000 videos (8.4 million frames) with diverse identities across nationalities, skin tones, and genders. Experimental results show that state-of-the-art detection models suffer over 30% performance drop on DigiFakeAV, and user studies confirm that the fake videos are nearly indistinguishable from real ones.
-Furthermore, we propose AVTSF , an audio-visual fusion detection model that achieves state-of-the-art performance on DF-TIMIT and establishes a benchmark for DigiFakeAV. This work presents the first systematic effort in constructing and evaluating a dataset tailored for diffusion-based digital human forgery, highlighting new research directions for robust deepfake detection.
-          </p>
-        </div>
+    <div class="abstract-card">
+      <p class="abstract-text">
+        In recent years, deepfake technology has advanced rapidly, yet its misuse poses serious threats to
+        information security and public safety. Existing datasets have mainly focused on traditional
+        <strong style="color: var(--text-primary);">face-swapping techniques</strong>, failing to reflect the emerging trend of digital human generation methods.
+        These diffusion-based approaches can generate highly realistic videos from speech and target images,
+        offering greater <em>flexibility</em>, <em>stealthiness</em>, and <em>multimodal coherence</em>, thus challenging current
+        detection strategies.
+      </p>
+      <br>
+      <p class="abstract-text">
+        To address this issue, we introduce <strong style="color: var(--accent-cyan);">DigiFakeAV</strong>, the first large-scale multimodal deepfake
+        dataset based on digital human synthesis. It contains <strong style="color: var(--text-primary);">60,000 videos (8.4 million frames)</strong>
+        with diverse identities across nationalities, skin tones, and genders. Experimental results show
+        that state-of-the-art detection models suffer over <strong style="color: var(--accent-pink);">30% performance drop</strong> on DigiFakeAV,
+        and user studies confirm that the fake videos are nearly indistinguishable from real ones.
+      </p>
+      <br>
+      <p class="abstract-text">
+        Furthermore, we propose <strong style="color: var(--accent-cyan);">AVTSF</strong>, an audio-visual fusion detection model that achieves
+        state-of-the-art performance on DF-TIMIT and establishes a benchmark for DigiFakeAV.
+        This work presents the first systematic effort in constructing and evaluating a dataset tailored
+        for diffusion-based digital human forgery, highlighting new research directions for robust deepfake detection.
+      </p>
+    </div>
+
+    <!-- 特性亮點 -->
+    <div class="features-grid" style="margin-top: 2.5rem;">
+      <div class="feature-card">
+        <div class="feature-icon cyan">🎭</div>
+        <h3>Digital Human Synthesis</h3>
+        <p>First benchmark focused on diffusion-based digital human generation, beyond traditional face-swapping methods.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon purple">🔊</div>
+        <h3>Multimodal Forgery</h3>
+        <p>Covers both Fake Video–Real Audio (FV-RA) and Fake Video–Fake Audio (FV-FA) categories for comprehensive evaluation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon pink">🌍</div>
+        <h3>Diverse Identities</h3>
+        <p>Multiple nationalities, skin tones, genders, and scenarios ensuring broad demographic representation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon amber">⚡</div>
+        <h3>Challenging Benchmark</h3>
+        <p>SOTA models drop 30%+ in performance, confirming the increased realism and difficulty of detection.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">🧠</div>
+        <h3>AVTSF Detector</h3>
+        <p>Proposed audio-visual temporal-spatial fusion model achieves new SOTA on DF-TIMIT dataset.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- End paper abstract -->
 
+<!-- ============================================
+     Pipeline
+============================================ -->
+<section class="section-wrapper pipeline-section" id="pipeline">
+  <div class="section-inner">
+    <div class="section-tag">Methodology</div>
+    <h2 class="section-title">DigiFakeAV <span class="accent">Pipeline</span></h2>
 
-<!-- Image Pipeline -->
-<section class="Pipeline">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title is-3 has-text-centered">DigiFakeAV Pipeline</h2>
-      <div id="Pipeline" class="Pipeline">
-        <div class="item">
-          <!-- Your image here -->
-          <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/figure03.png?raw=true " alt="DigiFakeAV Dataset Generation Workflow"/>
-          <h2 class="subtitle has-text-centered">
-            We generate the DigiFakeAV dataset using state-of-the-art deepfake and speech synthesis techniques. Specifically, we adopt five recent digital human generation methods and one advanced audio synthesis approach. Compared to prior deepfake dataset generation techniques, our selection offers notable differences and advantages.
-          </h2>
-        </div>
-      </div>
+    <div class="pipeline-img-wrapper">
+      <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/figure03.png?raw=true"
+           alt="DigiFakeAV Dataset Generation Workflow">
+    </div>
+    <p class="pipeline-caption">
+      We generate DigiFakeAV using five recent digital human generation methods (Sonic, Hallo1, Hallo2, Echomimic, V-Express)
+      and one advanced audio synthesis approach (CosyVoice 2). Compared to prior deepfake dataset generation techniques,
+      our selection offers notable differences and advantages in realism and multimodal coherence.
+    </p>
+
+    <!-- 方法標籤列 -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 2rem;">
+      <span style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--accent-cyan); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">Sonic</span>
+      <span style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--accent-cyan); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">Hallo1</span>
+      <span style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--accent-cyan); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">Hallo2</span>
+      <span style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--accent-cyan); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">Echomimic</span>
+      <span style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--accent-cyan); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">V-Express</span>
+      <span style="background: rgba(225,29,122,0.08); border: 1px solid rgba(225,29,122,0.25); color: var(--accent-pink); padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;">CosyVoice 2</span>
     </div>
   </div>
 </section>
-<!-- End image carousel -->
 
-  <!-- Image carousel -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title is-3 has-text-centered">Diversity</h2>
-        <!-- 示例第二個項目（可選） -->
-        <div class="item">
-          <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/figure02.png?raw=true " alt="Dataset Comparison"/>
-          <h2 class="subtitle has-text-centered">
-            Concrete examples demonstrating the diversity of DigiFakeAV, including multiple nationalities, diverse skin tones, various genders, and a range of scenarios.
-          </h2>
-        </div>
+<!-- 分隔線 -->
+<div class="section-divider"></div>
 
-      
-      </div>
+<!-- ============================================
+     Diversity
+============================================ -->
+<section class="section-wrapper diversity-section" id="diversity">
+  <div class="section-inner">
+    <div class="section-tag">Dataset</div>
+    <h2 class="section-title">Identity <span class="accent">Diversity</span></h2>
+
+    <div class="pipeline-img-wrapper">
+      <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/figure02.png?raw=true"
+           alt="Dataset Diversity">
     </div>
+    <p class="pipeline-caption" style="margin-top: 1.25rem;">
+      Concrete examples demonstrating the diversity of DigiFakeAV — including multiple nationalities,
+      diverse skin tones, various genders, and a wide range of real-world scenarios.
+    </p>
   </div>
 </section>
-<!-- End image carousel -->
 
+<!-- ============================================
+     Visualizations
+============================================ -->
+<section class="section-wrapper viz-section" id="visualizations">
+  <div class="section-inner">
+    <div class="section-tag">Samples</div>
+    <h2 class="section-title">Dataset <span class="accent">Visualizations</span></h2>
 
-
-<!-- Image carousel -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container">
-
-      <!-- Title -->
-      <h2 class="title is-3 has-text-centered">Visualizations</h2>
-
-      <!-- Fake Video - Real Audio (FV-RA) -->
-      <h3 class="subtitle is-5 has-text-centered"><strong>Fake Video–Real Audio (FV-RA)</strong></h3>
-      <p class="has-text-centered">
+    <!-- FV-RA -->
+    <div class="viz-category">
+      <div class="viz-category-header">
+        <span class="viz-badge fvra">FV-RA</span>
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Fake Video – Real Audio</h3>
+      </div>
+      <p class="viz-description">
         This category consists of fake videos created by synthesizing visual content conditioned on authentic audio.
-        We begin by extracting audio from real videos and converting it into WAV format. RetinaFace is then employed to detect and crop representative facial frames.
-        Using five digital human generation techniques—Sonic, Hallo1, Hallo2, Echomimic, and V-Express—we produce a total of 25,000 forged videos.
-        Modern adversaries can obtain both voice and facial data of targets, enabling highly convincing impersonation attacks.
-        Compared to traditional face-swapping methods, these forgeries pose a more credible and serious threat.
-        This subset provides researchers with valuable data to explore advanced identity deception scenarios.
+        We extract audio from real videos and convert it to WAV format. RetinaFace detects and crops representative
+        facial frames. Using five digital human generation techniques — <strong>Sonic, Hallo1, Hallo2, Echomimic, V-Express</strong>
+        — we produce a total of <strong>25,000 forged videos</strong>. Compared to traditional face-swapping methods,
+        these forgeries pose a more credible and serious threat.
       </p>
-
-      <!-- FV-RA GIFs -->
-      <div align="center">
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_10000_real_videos_10000%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_113_real_videos_113%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_2678_real_videos_2678%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_3023_real_videos_3023%2000_00_00-00_00_30.gif?raw=true " width="200" />
+      <div class="gif-grid">
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_10000_real_videos_10000%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 1"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_113_real_videos_113%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 2"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_2678_real_videos_2678%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 3"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_3023_real_videos_3023%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 4"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_3056_real_videos_3056%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 5"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_6464_real_videos_6464%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 6"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_66_real_videos_66%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 7"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_9889_real_videos_9889%2000_00_00-00_00_30.gif?raw=true" alt="FV-RA Sample 8"></div>
       </div>
-
-      <div align="center">
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_3056_real_videos_3056%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_6464_real_videos_6464%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_66_real_videos_66%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVRA/real_videos_9889_real_videos_9889%2000_00_00-00_00_30.gif?raw=true " width="200" />
-      </div>
-
-      <!-- Fake Video - Fake Audio (FV-FA) -->
-      <h3 class="subtitle is-5 has-text-centered mt-6"><strong>Fake Video–Fake Audio (FV-FA)</strong></h3>
-      <p class="has-text-centered">
-        This category encompasses both manipulated audio and video. We employed a state-of-the-art voice cloning method, CosyVoice 2.
-        Specifically, we first generated manipulated text using a large language model.
-        Then, by providing authentic audio–manipulated text pairs, the CosyVoice 2 model synthesized fake audio exhibiting the vocal characteristics of the target speaker.
-        Subsequently, using Sonic, Hallo1, Hallo2, and Echomimic, we generated 25,000 forged videos based on this fake audio.
-        This approach offers fraudsters a more flexible and realistic means of deception.
-      </p>
-
-      <!-- FV-FA GIFs -->
-      <div align="center">
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/FAFV_real_3_FAFV_real_3%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_1898_NEOreal_1898%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4217_NEOreal_4217%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4829_NEOreal_4829%2000_00_00-00_00_30.gif?raw=true " width="200" />
-      </div>
-
-      <div align="center">
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4935_NEOreal_4935%2000_00_00-00_00_30.gif?raw=true " width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_855%20(4)%2000_00_00-00_00_30.gif?raw=true" width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_895%20(5)%2000_00_00-00_00_30.gif?raw=true" width="200" />
-        <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_954%20(5)%2000_00_00-00_00_30.gif?raw=true" width="200" />
-      </div>
-
     </div>
-  </div>
-</section>
-<!-- End image carousel -->
 
-
-<!-- Dataset comparison image -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <!-- Title -->
-      <h2 class="title is-3 has-text-centered">Comparison</h2>
-
-      <!-- Image -->
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <figure class="image">
-            <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/dataset-com.png?raw=true " alt="Dataset Comparison">
-          </figure>
-        </div>
+    <!-- FV-FA -->
+    <div class="viz-category">
+      <div class="viz-category-header">
+        <span class="viz-badge fvfa">FV-FA</span>
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Fake Video – Fake Audio</h3>
+      </div>
+      <p class="viz-description fvfa-desc" style="border-left-color: var(--accent-pink);">
+        This category encompasses both manipulated audio and video. We employ state-of-the-art voice cloning
+        (<strong>CosyVoice 2</strong>): first generating manipulated text via a large language model, then synthesizing
+        fake audio with the target speaker's vocal characteristics. Using Sonic, Hallo1, Hallo2, and Echomimic,
+        we generate <strong>25,000 forged videos</strong>. This approach offers fraudsters a more flexible and realistic
+        means of deception.
+      </p>
+      <div class="gif-grid">
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/FAFV_real_3_FAFV_real_3%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 1"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_1898_NEOreal_1898%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 2"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4217_NEOreal_4217%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 3"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4829_NEOreal_4829%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 4"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/NEOreal_4935_NEOreal_4935%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 5"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_855%20(4)%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 6"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_895%20(5)%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 7"></div>
+        <div class="gif-item"><img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/FVFA/video_954%20(5)%2000_00_00-00_00_30.gif?raw=true" alt="FV-FA Sample 8"></div>
       </div>
     </div>
   </div>
 </section>
-<!-- End dataset comparison -->
 
-<!-- Future Works -->
-<section class="section" id="future-works">
-  <div class="container is-max-desktop content">
-    <h2 class="title has-text-centered">Future Works</h2>
-    <p>
-      Recent advances in digital human generation have led to increasingly realistic forgery techniques that surpass existing methods such as Sonic. These developments pose growing threats to multimedia security, social trust, and information integrity, calling for continued research and robust detection solutions.
-    </p>
-    <p>
-      To address these evolving challenges, we plan to continuously update and expand the DigiFakeAV dataset by incorporating emerging forgery techniques and diverse real-world scenarios. This effort aims to enhance the dataset's comprehensiveness and representativeness, fostering novel research directions and ensuring that detection models remain effective against increasingly sophisticated deepfake attacks.
+<!-- 分隔線 -->
+<div class="section-divider"></div>
+
+<!-- ============================================
+     Comparison
+============================================ -->
+<section class="section-wrapper comparison-section" id="comparison">
+  <div class="section-inner">
+    <div class="section-tag">Benchmark</div>
+    <h2 class="section-title">Dataset <span class="accent">Comparison</span></h2>
+
+    <div class="comparison-img-wrapper">
+      <img src="https://github.com/DigiFakeAV/DigiFakeAV-v1/blob/main/assets/dataset-com.png?raw=true"
+           alt="Dataset Comparison Table">
+    </div>
+    <p class="pipeline-caption" style="margin-top: 1.25rem;">
+      Comprehensive comparison between DigiFakeAV and existing deepfake detection datasets.
+      DigiFakeAV excels in scale, synthesis method diversity, and multimodal coverage.
     </p>
   </div>
 </section>
-<!-- End Future Works -->
-  
-<!--BibTex citation -->
-  <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content">
-      <h2 class="title">BibTeX</h2>
-      <pre><code>@misc{liu2025faceswappingdiffusionbaseddigital,
-      title={Beyond Face Swapping: A Diffusion-Based Digital Human Benchmark for Multimodal Deepfake Detection}, 
-      author={Jiaxin Liu and Jia Wang and Saihui Hou and Min Ren and Huijia Wu and Long Ma and Renwang Pei and Zhaofeng He},
-      year={2025},
-      eprint={2505.16512},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2505.16512}, 
-}</code></pre>
-    </div>
-</section>
-<!--End BibTex citation -->
 
+<!-- ============================================
+     Future Works
+============================================ -->
+<section class="section-wrapper future-section" id="future-works">
+  <div class="section-inner">
+    <div class="section-tag">Roadmap</div>
+    <h2 class="section-title">Future <span class="accent">Works</span></h2>
 
-  <footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-
-          <p>
-            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
-            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-
-        </div>
+    <div class="future-cards">
+      <div class="future-card">
+        <div class="fc-icon">🚀</div>
+        <h3>Expanding Synthesis Methods</h3>
+        <p>
+          Recent advances in digital human generation have led to increasingly realistic forgery techniques
+          that surpass existing methods such as Sonic. We plan to continuously integrate emerging methods
+          to keep the benchmark at the frontier.
+        </p>
+      </div>
+      <div class="future-card">
+        <div class="fc-icon">🌐</div>
+        <h3>Diverse Real-World Scenarios</h3>
+        <p>
+          We aim to expand DigiFakeAV with more diverse real-world scenarios — including different lighting
+          conditions, languages, and speaking styles — to improve dataset comprehensiveness and representativeness.
+        </p>
+      </div>
+      <div class="future-card">
+        <div class="fc-icon">🔬</div>
+        <h3>Robust Detection Research</h3>
+        <p>
+          These developments pose growing threats to multimedia security and social trust.
+          We aim to foster novel research directions ensuring detection models remain effective against
+          increasingly sophisticated deepfake attacks.
+        </p>
       </div>
     </div>
   </div>
+</section>
+
+<!-- 分隔線 -->
+<div class="section-divider"></div>
+
+<!-- ============================================
+     BibTeX
+============================================ -->
+<section class="section-wrapper bibtex-section" id="bibtex">
+  <div class="section-inner">
+    <div class="section-tag">Citation</div>
+    <h2 class="section-title">BibTeX</h2>
+
+    <div class="bibtex-wrapper">
+      <pre class="bibtex-pre" id="bibtex-code"><span class="brace">@misc{</span><span class="key">liu2025faceswappingdiffusionbaseddigital</span><span class="brace">,</span>
+  <span class="key">title</span>     = <span class="value">{Beyond Face Swapping: A Diffusion-Based Digital Human Benchmark
+            for Multimodal Deepfake Detection}</span>,
+  <span class="key">author</span>    = <span class="value">{Jiaxin Liu and Jia Wang and Saihui Hou and Min Ren
+            and Huijia Wu and Long Ma and Renwang Pei and Zhaofeng He}</span>,
+  <span class="key">year</span>      = <span class="value">{2025}</span>,
+  <span class="key">eprint</span>    = <span class="value">{2505.16512}</span>,
+  <span class="key">archivePrefix</span> = <span class="value">{arXiv}</span>,
+  <span class="key">primaryClass</span>  = <span class="value">{cs.CV}</span>,
+  <span class="key">url</span>       = <span class="value">{https://arxiv.org/abs/2505.16512}</span>
+<span class="brace">}</span></pre>
+      <button class="copy-btn" onclick="copyBibtex()">⎘ Copy</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     Footer
+============================================ -->
+<footer>
+  <p>
+    Built upon the
+    <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>
+    &nbsp;·&nbsp;
+    Licensed under
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>
+  </p>
+  <p style="margin-top: 0.5rem;">
+    © 2025 DigiFakeAV Authors &nbsp;·&nbsp;
+    <a href="https://hubeiwuhanliu.github.io/DigiFakeAV.github.io/">hubeiwuhanliu.github.io/DigiFakeAV.github.io</a>
+  </p>
 </footer>
 
-<!-- Statcounter tracking code -->
-  
-<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+<!-- ============================================
+     JavaScript
+============================================ -->
+<script>
+  /* ----- 複製 BibTeX ----- */
+  function copyBibtex() {
+    const raw = `@misc{liu2025faceswappingdiffusionbaseddigital,
+  title={Beyond Face Swapping: A Diffusion-Based Digital Human Benchmark for Multimodal Deepfake Detection},
+  author={Jiaxin Liu and Jia Wang and Saihui Hou and Min Ren and Huijia Wu and Long Ma and Renwang Pei and Zhaofeng He},
+  year={2025},
+  eprint={2505.16512},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2505.16512}
+}`;
+    navigator.clipboard.writeText(raw).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Copied!';
+      btn.style.color = 'var(--accent-green)';
+      btn.style.borderColor = 'var(--accent-green)';
+      setTimeout(() => {
+        btn.textContent = '⎘ Copy';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2500);
+    });
+  }
 
-    <!-- End of Statcounter Code -->
+  /* ----- Scroll 進場動畫 ----- */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        entry.target.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      }
+    });
+  }, { threshold: 0.1 });
 
-  </body>
-  </html>
+  document.querySelectorAll(
+    '.feature-card, .future-card, .abstract-card, .viz-category, ' +
+    '.pipeline-img-wrapper, .comparison-img-wrapper, .stats-bar'
+  ).forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    observer.observe(el);
+  });
+
+  /* ----- 頂部導覽列捲動高亮 ----- */
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.top-nav .nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 80;
+      if (window.scrollY >= top) current = sec.getAttribute('id');
+    });
+    navLinks.forEach(link => {
+      link.style.color = link.getAttribute('href') === `#${current}`
+        ? 'var(--accent-cyan)'
+        : '';
+    });
+  });
+</script>
+
+</body>
+</html>
